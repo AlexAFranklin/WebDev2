@@ -5,29 +5,65 @@ const validator = require('email-validator');
 module.exports = {
 
     getAll: async (req, res) => {
-        const listOfItems = await Auction.findAll();
-        res.json(listOfItems).status(200);
-
-    },
-    createPost: async (req, res) => {
-        
-        const post = req.body;
-        if (isPostValid(post, req, res)) {
-            await Auction.create(post);
-            res.json(post).status(201);
+        try{
+            const listOfItems = await Auction.findAll();
+            res.json(listOfItems).status(200);
+        } catch (error){
+            console.error(error);
+            res.status(500).json({ message: "Internal server error" });
         }
 
 
+    },
+    createPost: async (req, res) => {
+        try {
+            const post = req.body;
+            if (isPostValid(post, req, res)) {
+                const createdPost = await Auction.create(post);
+                res.json(createdPost).status(201);
+            }
+        } catch (error){
+            console.error(error);
+            res.status(500).json({ message: "Internal server error" });
+        }
+        
     }, 
     getById: async (req, res) => {
-        const id = req.params.id;
-        const item = await Auction.findAll({
-            where: {
-                id: id
+        try {
+            const id = req.params.id;
+            const item = await Auction.findByPk(id)
+            res.json(item).status(200);
+        } catch (error){
+            console.error(error);
+            res.status(500).json({ message: "Internal server error" });
+        }
+
+    },
+    addPriceRequest: async (req, res) => {
+        const updateItem = req.body; 
+        const updateId = req.params.id;
+    
+        try {
+            const item = await Auction.findByPk(updateId)
+            if (item === null) {
+                return res.status(400).json({ message: "Item Not Found" });
             }
-        })
-        res.json(item).status(200);
+            if (isPatchValid(item, updateItem, req, res)) {
+                item.lastPrice = updateItem.lastPrice;
+                item.lastBidderEmail = updateItem.lastBidderEmail;
+                const newItem = await item.save();
+                if (!newItem){
+                    throw Error("Item not updated");
+                }
+                res.status(200).json(newItem);
+            }
+
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: "Internal server error" });
+        }
     }
+    
 
 }
 
@@ -66,6 +102,22 @@ function isPostValid(post, req, res){
         return false;
     }
 
+    return true;
+}
+
+function isPatchValid(oldItem, newItem, req, res){
+    if (!validator.validate(newItem.lastBidderEmail)) {
+        res.status(400).send({
+            message: "Must provide valid email address."
+        });
+        return false;
+    }
+    if (oldItem.lastPrice >= newItem.lastPrice) {
+        res.status(400).send({
+            message: "New Price must be higher than last bidding price"
+        });
+        return false;
+    }
     return true;
 }
 

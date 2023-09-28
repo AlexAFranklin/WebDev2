@@ -9,4 +9,6 @@ router.get("/:id", controller.getById);
 
 router.post("/", controller.createPost);
 
+router.patch("/:id", controller.addPriceRequest)
+
 module.exports = router;

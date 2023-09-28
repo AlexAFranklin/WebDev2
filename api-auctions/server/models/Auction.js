@@ -1,6 +1,12 @@
 module.exports = (sequelize, DataTypes) => {
 
     const auctionItems = sequelize.define("Auction",  {
+        id: {
+            type: DataTypes.INTEGER,
+            autoIncrement: true,
+            primaryKey: true
+
+        },
         sellerEmail: {
             type: DataTypes.STRING(320),
             allowNull: false,
