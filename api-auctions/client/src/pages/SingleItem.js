@@ -10,11 +10,12 @@ import * as Yup from 'yup';
 
 function SingleItem() {
   let navigate = useNavigate();
+
   const initialValues = {
     lastBidderEmail: "",
     lastPrice: ""
-
 }
+
     let { id } = useParams();
 
     const [item, setItem] = useState({});

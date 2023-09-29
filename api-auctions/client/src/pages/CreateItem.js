@@ -6,6 +6,8 @@ import {useNavigate} from "react-router-dom";
 import Navbar from '../pages/Header';
 
 function CreatePost(){
+
+
     const initialValues = {
         sellerEmail: "",
         itemName: "",
@@ -13,6 +15,7 @@ function CreatePost(){
         lastPrice: ""
 
     }
+
 let navigate = useNavigate();
     const schema = Yup.object({
         sellerEmail: Yup
@@ -45,6 +48,7 @@ let navigate = useNavigate();
             console.log(response.data);
            navigate(`/${response.data.id}`);
             });
+            // add error handling!!!! - modals 
     };
 
     return (

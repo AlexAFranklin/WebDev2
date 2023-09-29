@@ -1,13 +1,19 @@
 const {Users} = require("../models");
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
-const validator = require('email-validator');
+const validator = require('validator');
+const bodyParser = require('body-parser');
+// const cookieParser = require('cookie-parser');
+const session = require('express-session'); 
 
 module.exports = {
 
     createUser : async (req, res) => {
         const newUser = req.body; 
         try {
+           if (!validateNewUser(newUser, req, res)) {
+            return;
+           }
             const userExists = await Users.findAll({
                 where: {
                     username: newUser.username
@@ -18,6 +24,7 @@ module.exports = {
                
                 return res.status(400).json({message : "That username is already in use", user: true})
             }
+
             const emailExists = await Users.findAll({
                 where: {
                     email: newUser.email
@@ -96,8 +103,9 @@ module.exports = {
             if (userFound.length > 0  ){
                 bcrypt.compare(pass,  userFound[0].password, (error, response) => {
                     if (response){
-                        userFound[0].password = null;
-                        return res.status(200).json(userFound)
+                        req.session.user = userFound;
+                        console.log(req.session.user);
+                        return res.status(200).json({username: userFound[0].username, email: userFound[0].email});
                     } else {
                         return res.status(400).json({message: "Incorrect username and password combination"})
                     }
@@ -117,19 +125,61 @@ module.exports = {
 }
 
 function validateNewUser(user, req, res){
-    let usernamePattern = /^[a-z0-9]*$/;
-    let passwordPattern = 
+  
+    
+    const passwordOptions = {
+        returnScore: true, 
+        pointsPerRepeat: 0,
+        pointsPerUnique: 0,
+        pointsForContainingLower: 10, 
+        pointsForContainingUpper: 10, 
+        pointsForContainingNumber: 5, 
+        pointsForContainingSymbol: 5 
+      };
 
-    if (!validator.validate(user.email)) {
+     if (user.email === undefined || user.username === undefined || user.password === undefined) {
+        res.status(400).send({
+            message: "Must provide valid email address, username, and password."
+        });
+        return false;
+     } 
+    
+
+    if (!validator.isEmail(user.email)) {
         res.status(400).send({
             message: "Must provide valid email address."
         });
         return false;
     }
-    if (user.username.length > 20 || user.username.length < 4){
-
+    if (!validator.isLength(user.username, {min: 4, max:20})){
+        res.status(400).send({
+            message: "Username must be between 4 and 20 characters long."
+        });
+        return false;
     }
 
+    if (!validator.isAlphanumeric(user.username) || !validator.isLowercase(user.username)) {
+        res.status(400).send({
+            message: "Username must be comprised only of lowercase letters and numbers."
+        });
+        return false;
+    }
+ 
+    if (validator.isStrongPassword(user.password, passwordOptions) < 25) {
+        res.status(400).send({
+            message: "Password must contain at least one uppercase letter, one lower case letter, and one number or special character."
+        });
+        return false;
+    }
+
+    if (!validator.isLength(user.password, {min: 6, max:100})) {
+        res.status(400).send({
+            message: "Password must be between 6 and 100 characters long."
+        });
+        return false;
+    }
+ 
+    return true;
 
 }
 
