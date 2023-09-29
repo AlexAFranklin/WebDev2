@@ -117,10 +117,19 @@ module.exports = {
 }
 
 function validateNewUser(user, req, res){
+    let usernamePattern = /^[a-z0-9]*$/;
+    let passwordPattern = 
+
     if (!validator.validate(user.email)) {
         res.status(400).send({
             message: "Must provide valid email address."
         });
         return false;
     }
+    if (user.username.length > 20 || user.username.length < 4){
+
+    }
+
+
 }
+
