@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
         },
         lastPrice: {
+            // TODO changed to decimal - check (money)
             type: DataTypes.DOUBLE,
             allowNull: false,
         },

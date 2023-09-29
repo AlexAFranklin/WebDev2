@@ -5,6 +5,9 @@ const validator = require('email-validator');
 module.exports = {
 
     getAll: async (req, res) => {
+        // intentionally send error 
+        res.status(500).json({ message: "Internal server error" });
+        return;
         try{
             const listOfItems = await Auction.findAll();
             res.json(listOfItems).status(200);
@@ -39,7 +42,7 @@ module.exports = {
         }
 
     },
-    addPriceRequest: async (req, res) => {
+    updateBidPrice: async (req, res) => {
         const updateItem = req.body; 
         const updateId = req.params.id;
     
@@ -52,6 +55,8 @@ module.exports = {
                 item.lastPrice = updateItem.lastPrice;
                 item.lastBidderEmail = updateItem.lastBidderEmail;
                 const newItem = await item.save();
+                // TODO check old values against new ones
+                // is this if necessary? - double check docs 
                 if (!newItem){
                     throw Error("Item not updated");
                 }
@@ -68,8 +73,8 @@ module.exports = {
 }
 
 function isPostValid(post, req, res){
-   
-    let pattern = /^[A-Za-z.\s_-]+$/;
+   // TODO add validator npm 
+    let pattern = /^[A-Za-z\. _-]+$/;
     if (!validator.validate(post.sellerEmail)) {
         res.status(400).send({
             message: "Must provide valid email address."
