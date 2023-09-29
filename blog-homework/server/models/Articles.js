@@ -1,40 +1,34 @@
-
-
-
+//const Users = require('./Users');
 module.exports = (sequelize, DataTypes) => {
 
-    const Users = sequelize.define("Users",  {
+    const Articles = sequelize.define("Articles",  {
         id: {
             type: DataTypes.INTEGER,
             autoIncrement: true,
             primaryKey: true
 
         },
-        username: {
-            type: DataTypes.STRING(20),
+        authorId: {
+            type: DataTypes.INTEGER,
             allowNull: false,
         },
-        password: {
+        title: {
             type: DataTypes.STRING(73),
             allowNull: false,
         },
-        email: {
+        content: {
             type: DataTypes.STRING(150),
             allowNull: false,
         },
-        isActive : {
+        isLive : {
             type: DataTypes.BOOLEAN, 
             allowNull: false,
             defaultValue : true
-
-
         }
 
     })
-    Users.associate = (models) => {
-        Users.hasMany(models.Articles, {
-            foreignKey: 'authorId'
-        })
+    Articles.associate = (models) => {
+        Articles.belongsTo(models.Users);
     }
-    return Users;
+    return Articles;
 }

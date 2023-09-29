@@ -92,12 +92,12 @@ module.exports = {
         }
     }, 
     login : async (req, res) => {
-        const user = req.body.username;
+        const user = req.body.email;
         const pass = req.body.password;
         try {
             const userFound = await Users.findAll({
                 where: {
-                    username: user
+                    email: user
                 }
             })
             if (userFound.length > 0  ){
