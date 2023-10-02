@@ -35,6 +35,9 @@ module.exports = (sequelize, DataTypes) => {
         Users.hasMany(models.Articles, {
             foreignKey: 'authorId'
         })
+        Users.hasMany(models.Comments, {
+            foreignKey: 'authorId'
+        })
     }
     return Users;
 }

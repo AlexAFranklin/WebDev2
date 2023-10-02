@@ -1,0 +1,10 @@
+const express = require('express');
+const router = express.Router();
+const controller = require("../controllers/comment-controller");
+
+router.post("/new", controller.createComment);
+router.get("/article/:id([0-9]+)", controller.viewAllByArticle);
+
+
+
+module.exports = router;

@@ -13,11 +13,11 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
         },
         title: {
-            type: DataTypes.STRING(73),
+            type: DataTypes.STRING(100),
             allowNull: false,
         },
         content: {
-            type: DataTypes.STRING(150),
+            type: DataTypes.STRING(1500),
             allowNull: false,
         },
         isLive : {
@@ -28,7 +28,10 @@ module.exports = (sequelize, DataTypes) => {
 
     })
     Articles.associate = (models) => {
-        Articles.belongsTo(models.Users);
+        Articles.hasMany(models.Comments, {
+            foreignKey: 'articleId'
+        })
+
     }
     return Articles;
 }

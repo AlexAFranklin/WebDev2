@@ -6,8 +6,8 @@ module.exports = {
 
     getAll: async (req, res) => {
         // intentionally send error 
-        res.status(500).json({ message: "Internal server error" });
-        return;
+       // res.status(500).json({ message: "Internal server error" });
+       // return;
         try{
             const listOfItems = await Auction.findAll();
             res.json(listOfItems).status(200);

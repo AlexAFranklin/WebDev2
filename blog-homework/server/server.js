@@ -30,6 +30,11 @@ const db = require('./models')
 const userRouter = require("./routes/user-routes");
 app.use('/users', userRouter);
 
+const articleRouter = require("./routes/article-routes");
+app.use('/blogs', articleRouter);
+
+const commentRouter = require("./routes/comments-routes");
+app.use('/comments', commentRouter);
 
 
 db.sequelize.sync().then(() => {

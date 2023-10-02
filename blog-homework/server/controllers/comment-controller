@@ -1,0 +1,81 @@
+const {Articles} = require("../models");
+const {Users} = require("../models");
+const {Comments} = require("../models");
+// const bcrypt = require('bcrypt');
+// const saltRounds = 10;
+const validator = require('validator');
+
+module.exports = {
+    createComment : async (req, res) => {
+        
+        try {
+            
+            const comment = req.body;
+            if (!validateComment(comment, req, res)) {
+                return;
+            }
+            const user = await Users.findAll({
+                where: {
+                    id: comment.authorId
+                }
+            })
+            if (user.length < 1){
+                return res.status(400).json({message : "Create comment from valid user account", user: false})
+            }
+            const article = await Articles.findAll({
+                where: {
+                    id: comment.articleId
+                }
+            })
+            if (article.length < 1){
+                return res.status(400).json({message : "Cannot comment on non-existant post", post: false})
+            }
+            const newComment = await Comments.create(comment);
+            return res.status(201).json(newComment)
+            
+
+
+        
+            
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({message: "Internal Server Error"})
+        }
+    }, 
+
+    viewAllByArticle : async (req, res) => {
+        try {
+            const articleId = req.params.id
+            console.log("Article ID: " + articleId);
+            const comments = await Comments.findAll({
+                where: {
+                    articleId: articleId
+                },
+                include : Users
+            })
+            return res.status(200).json(comments);
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({message: "Internal Server Error"})
+        }
+
+
+    }
+}
+
+function validateComment(comment, req, res) {
+    if (comment.authorId === null || comment.articleId === null || comment.body === null) {
+        res.status(400).send({
+            message: "You must provide a author id, article id, and a comment body."
+        });
+        return false;
+    }
+    if (!validator.isLength(comment.body, {min: 2, max:5000})){
+        res.status(400).send({
+            message: "Comment body must be between 2 and 5000 characters long."
+        });
+        return false;
+    }
+
+    return true;
+}

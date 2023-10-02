@@ -1,0 +1,95 @@
+const {Articles} = require("../models");
+const {Users} = require("../models");
+// const bcrypt = require('bcrypt');
+// const saltRounds = 10;
+const validator = require('validator');
+// const bodyParser = require('body-parser');
+// // const cookieParser = require('cookie-parser');
+// const session = require('express-session'); 
+
+module.exports = {
+    createArticle : async (req, res ) => { 
+    const article = req.body; 
+        try {
+            if (!postValidation(article, req, res)) {
+                return;
+            }
+            const user = await Users.findAll({
+                where: {
+                    id: article.authorId
+                }
+            })
+            if (user.length < 1){
+                return res.status(400).json({message : "Create post from valid user account", user: false})
+            }
+            const newPost = await Articles.create(article);
+            res.status(201).json(newPost);
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({message: "Internal Server Error"})
+        }
+    },
+
+    viewAll : async (req, res ) => { 
+        try {
+            const listOfArticles = await Articles.findAll();
+            res.status(200).json(listOfArticles);
+            
+        } catch {
+            console.log(error);
+            res.status(500).json({message: "Internal Server Error"}) 
+        }
+
+    }, 
+    viewOne: async (req, res) => {
+        try {
+           const articleId = req.params.id;
+           const post = await Articles.findByPk(articleId);
+           if (post === null) {
+            return res.status(400).json({message: "That article does not exist", exists : false})  
+           }
+           res.status(200).json(post);
+           
+        }
+        catch (error) {
+            console.log(error);
+            res.status(500).json({message: "Internal Server Error"})    
+        }
+    }
+}
+function postValidation (article, req, res) {
+    if (article.authorId === undefined ) {
+        res.status(400).send({
+            message: "Must be logged in from account."
+        });
+        return false;
+    }
+    if (article.title === undefined ){
+        res.status(400).send({
+            message: "You must provide an article title."
+        });
+        return false;
+    }
+     if (article.content === undefined) {
+        res.status(400).send({
+            message: "You must provide article content."
+        });
+        return false;
+     }
+      if (!validator.isLength(article.title, {min: 10, max:100})) {
+        res.status(400).send({
+            message: "Article title must be between 10 and 100 characters."
+        });
+        return false;
+      }
+      if (!validator.isLength(article.content, {min: 50, max:4000})) {
+        res.status(400).send({
+            message: "Article content must be between 50 and 4000 characters."
+        });
+        return false;
+
+      }
+      return true;
+    
+}
