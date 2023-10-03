@@ -8,17 +8,19 @@ module.exports = (sequelize, DataTypes) => {
             primaryKey: true
 
         },
-        authorId: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-        },
-        articleId: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-        },
         body: {
             type: DataTypes.STRING(5000),
             allowNull: false,
+        },
+        ArticleId: {
+            type: DataTypes.INTEGER,
+            foreignKey: true
+
+        },
+        UserId: {
+            type: DataTypes.INTEGER,
+            foreignKey: true
+
         }
 
     })

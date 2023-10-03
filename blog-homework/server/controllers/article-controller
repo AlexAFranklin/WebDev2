@@ -3,12 +3,15 @@ const {Users} = require("../models");
 // const bcrypt = require('bcrypt');
 // const saltRounds = 10;
 const validator = require('validator');
+const jwt = require('jsonwebtoken');
+
 // const bodyParser = require('body-parser');
 // // const cookieParser = require('cookie-parser');
 // const session = require('express-session'); 
 
 module.exports = {
     createArticle : async (req, res ) => { 
+         
     const article = req.body; 
         try {
             if (!postValidation(article, req, res)) {
@@ -16,14 +19,15 @@ module.exports = {
             }
             const user = await Users.findAll({
                 where: {
-                    id: article.authorId
+                    id: article.UserId
                 }
             })
             if (user.length < 1){
                 return res.status(400).json({message : "Create post from valid user account", user: false})
             }
             const newPost = await Articles.create(article);
-            res.status(201).json(newPost);
+            userId = user.id; 
+            res.status(201).json({Article: newPost, UserId: userId});
 
         } catch (error) {
             console.log(error);
@@ -32,8 +36,14 @@ module.exports = {
     },
 
     viewAll : async (req, res ) => { 
+       // return res.status(500).json({message: "Internal Server Error"})
         try {
-            const listOfArticles = await Articles.findAll();
+            const listOfArticles = await Articles.findAll({
+                include: [{
+                  model: Users,
+                  attributes: ['username'] 
+                }]           
+                });
             res.status(200).json(listOfArticles);
             
         } catch {
@@ -43,9 +53,15 @@ module.exports = {
 
     }, 
     viewOne: async (req, res) => {
+       // return res.status(500).json({message: "Internal Server Error"})
         try {
            const articleId = req.params.id;
-           const post = await Articles.findByPk(articleId);
+           const post = await Articles.findByPk(articleId, {
+            include: [{
+              model: Users,
+              attributes: ['username'] 
+            }]           
+            });
            if (post === null) {
             return res.status(400).json({message: "That article does not exist", exists : false})  
            }
@@ -59,7 +75,7 @@ module.exports = {
     }
 }
 function postValidation (article, req, res) {
-    if (article.authorId === undefined ) {
+    if (article.UserId === undefined ) {
         res.status(400).send({
             message: "Must be logged in from account."
         });

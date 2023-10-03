@@ -8,7 +8,7 @@ const session = require('express-session');
 app.use(express.json());
 app.use(cors({
     origin: ["http://localhost:3000"], 
-    method: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true
 }))
 app.use(cookieParser())
@@ -19,7 +19,7 @@ app.use(session({
     resave: false, 
     saveUninitialized: false, 
     cookie: {
-        expires: 60 * 60 * 3
+        expires: 60 * 60 * 24
     }
 }))
 

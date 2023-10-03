@@ -8,9 +8,10 @@ module.exports = (sequelize, DataTypes) => {
             primaryKey: true
 
         },
-        authorId: {
+        UserId: {
             type: DataTypes.INTEGER,
-            allowNull: false,
+            foreignKey: true
+
         },
         title: {
             type: DataTypes.STRING(100),
@@ -29,8 +30,10 @@ module.exports = (sequelize, DataTypes) => {
     })
     Articles.associate = (models) => {
         Articles.hasMany(models.Comments, {
-            foreignKey: 'articleId'
+            foreignKey: 'ArticleId'
         })
+        Articles.belongsTo(models.Users);
+
 
     }
     return Articles;

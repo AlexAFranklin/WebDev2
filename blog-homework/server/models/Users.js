@@ -33,11 +33,32 @@ module.exports = (sequelize, DataTypes) => {
     })
     Users.associate = (models) => {
         Users.hasMany(models.Articles, {
-            foreignKey: 'authorId'
+            foreignKey: 'UserId'
         })
         Users.hasMany(models.Comments, {
-            foreignKey: 'authorId'
+            foreignKey: 'UserId'
         })
     }
     return Users;
 }
+
+// TODO - proper way to exclued PW from request response. 
+
+// sequelize.define(
+//     'User',
+//     {
+//         id: { type: DataType.UUID, defaultValue: Sequelize.UUIDV4, primaryKey: true },
+//         username: { type: DataType.STRING, allowNull: false },
+//         password: { type: DataType.STRING, allowNull: false }
+//     },
+//     {
+//         hooks: {
+//             afterCreate: (record) => {
+//                 delete record.dataValues.password;
+//             },
+//             afterUpdate: (record) => {
+//                 delete record.dataValues.password;
+//             },
+//         }
+//     }
+// );

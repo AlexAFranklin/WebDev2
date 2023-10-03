@@ -5,8 +5,12 @@ const validator = require('validator');
 const bodyParser = require('body-parser');
 // const cookieParser = require('cookie-parser');
 const session = require('express-session'); 
+const jwt = require('jsonwebtoken');
+
+
 
 module.exports = {
+    
 
     createUser : async (req, res) => {
         const newUser = req.body; 
@@ -103,15 +107,22 @@ module.exports = {
             if (userFound.length > 0  ){
                 bcrypt.compare(pass,  userFound[0].password, (error, response) => {
                     if (response){
-                        req.session.user = userFound;
+                        
+                        const id = userFound[0].id;
+                        const token = jwt.sign({id}, "jwtSecret", {
+                            expiresIn: 1200, 
+                        })
+                        // TODO .env variable!! 
+                        req.session.user = userFound[0];
+
                         console.log(req.session.user);
-                        return res.status(200).json({username: userFound[0].username, email: userFound[0].email});
+                        return res.status(200).json({auth: true, token: token, result : {username: userFound[0].username, email: userFound[0].email}});
                     } else {
-                        return res.status(400).json({message: "Incorrect username and password combination"})
+                        return res.status(400).json({auth: false, message: "Incorrect username and password combination"})
                     }
                 })
             } else {
-                return res.status(400).json({message: "Incorrect username and password combination"})
+                return res.status(400).json({auth: false, message: "Incorrect username and password combination"})
             }
             
         } catch (error) {
@@ -119,6 +130,35 @@ module.exports = {
             res.status(500).json({message: "Internal Server Error"})
         }
 
+    }, 
+    verifyJWT: async (req, res) => {
+    const token = req.headers["x-access-token"];
+    if (!token) {
+        console.log("NO TOKEN")
+        res.send({auth: false});
+    } else {
+        jwt.verify(token, "jwtSecret", (err, decoded) => {
+            if (err) {
+                console.log(err);
+                res.json({auth: false, message: "failed to authenticate", error: err})
+            } else {
+                console.log("this worked - server")
+                req.userId = decoded.id;
+            }
+        })
+    }
+    console.log("am I even here?")
+    }, 
+    getAuth :  (req, res) => {
+        res.send({diditwork: true, message: "yay"})
+
+    },
+    validateLogin : (req, res) => {
+        if (req.session.user) {
+            res.send({loggedIn: true, user: req.session.user})
+        } else {
+            res.send({loggedIn: false, user: req.session.user})
+        }
     }
 
 
@@ -137,9 +177,16 @@ function validateNewUser(user, req, res){
         pointsForContainingSymbol: 5 
       };
 
-     if (user.email === undefined || user.username === undefined || user.password === undefined) {
+     if (user.email === undefined || user.username === undefined || user.password === undefined || user.passwordConfirm === undefined) {
         res.status(400).send({
             message: "Must provide valid email address, username, and password."
+        });
+        return false;
+     } 
+
+     if (user.password !== user.passwordConfirm) {
+        res.status(400).send({
+            message: "Passwords must match"
         });
         return false;
      } 
