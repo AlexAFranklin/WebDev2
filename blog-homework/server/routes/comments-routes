@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const controller = require("../controllers/comment-controller");
+const Authenticate = require("../Authentication/AuthMiddleware")
 
-router.post("/new", controller.createComment);
-router.get("/article/:id([0-9]+)", controller.viewAllByArticle);
+router.post("/new", Authenticate, controller.createComment);
+router.get("/article/:id([0-9]+)",  controller.viewAllByArticle);
 router.get("/comment/:id([0-9]+)", controller.viewByComment)
 router.get("/user/:id([0-9]+)", controller.viewAllByUser)
 

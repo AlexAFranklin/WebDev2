@@ -9,8 +9,10 @@ const jwt = require('jsonwebtoken');
 
 
 
+
 module.exports = {
     
+    // TODO: rate limiting system ?? 
 
     createUser : async (req, res) => {
         const newUser = req.body; 
@@ -44,6 +46,7 @@ module.exports = {
                     res.status(500).json({message: "Internal Server Error"})
                 }
                 try {
+                    // return ID always. - not enture user TODO 
                     newUser.password = hash;
                     const createdUser = await Users.create(newUser);
                     createdUser.password = null;
@@ -96,6 +99,7 @@ module.exports = {
         }
     }, 
     login : async (req, res) => {
+    //    return res.status(400).json({auth: false, message: "Incorrect username and password combination"})
         const user = req.body.email;
         const pass = req.body.password;
         try {
@@ -131,25 +135,8 @@ module.exports = {
         }
 
     }, 
-    verifyJWT: async (req, res) => {
-    const token = req.headers["x-access-token"];
-    if (!token) {
-        console.log("NO TOKEN")
-        res.send({auth: false});
-    } else {
-        jwt.verify(token, "jwtSecret", (err, decoded) => {
-            if (err) {
-                console.log(err);
-                res.json({auth: false, message: "failed to authenticate", error: err})
-            } else {
-                console.log("this worked - server")
-                req.userId = decoded.id;
-            }
-        })
-    }
-    console.log("am I even here?")
-    }, 
     getAuth :  (req, res) => {
+        console.log("I am getting in here")
         res.send({diditwork: true, message: "yay"})
 
     },

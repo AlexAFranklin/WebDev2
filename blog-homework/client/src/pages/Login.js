@@ -1,30 +1,33 @@
 import React from 'react';
 import axios from 'axios'; 
 import '../App.css';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import {useNavigate} from "react-router-dom";
 import {Formik, Form, Field, ErrorMessage, withFormik} from 'formik';
 import * as Yup from 'yup';
+import Alert from './Alert'
+import { Context } from '../App'; 
+
+
 
 function Login() {
+const navigate = useNavigate();
+const [isAuth, setIsAuth] = useContext(Context)
+const [usernameGlob, setUsernameGlob] = useContext(Context)
+
+
+
+
     const [userExists, setUserExists] = useState(false);
     const [userCreated, setUserCreated] = useState(false);
     const [usernameExists, setUsernameExists] = useState(false);
     const [emailExists, setEmailExists] = useState(false);
     const [username, setUsername] = useState("");
     const [loggedIn, setLoggedIn] = useState(false)
+    const [errorMsg, setErrorMsg] = useState(false)
     axios.defaults.withCredentials = true;
 
-    useEffect(() => {
-        axios.get("http://localhost:8080/users/login")
-        .then((response) => {
-            console.log(response)
-            console.log("changing")
 
-        }).catch((error) => {
-            console.log(error)
-        })
-    }, [])
 
 
 
@@ -96,6 +99,7 @@ function Login() {
             console.log("this didn't work")
             console.log(error)
         })
+
     }
 
 
@@ -135,13 +139,19 @@ function Login() {
             if (response.data.auth === true) {
                 console.log("logged in")
                 setLoggedIn(true);
+                setErrorMsg(null)
                localStorage.setItem("token",  response.data.token);
+               setIsAuth(true);
+               setUsernameGlob("ALEX")
+               console.log("is auth? " + isAuth)
+               navigate(`/`);
                
             }
             
         })
         .catch((error) => {
-            console.log(error)
+            setErrorMsg(error.response.data.message)
+            console.log(error.response.data.message)
         })
     }
 
@@ -205,6 +215,13 @@ function Login() {
 
 
             <p onClick={toggleLogin}>Register</p>
+            {errorMsg && (
+                <Alert message={errorMsg} showModal={true} />
+                
+            )}
+
+
+
             </>
         )
     } else {

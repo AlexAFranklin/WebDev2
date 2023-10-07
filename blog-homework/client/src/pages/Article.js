@@ -1,8 +1,10 @@
 import React from 'react';
 import axios from 'axios'; 
 import '../App.css';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import {useNavigate, useParams} from "react-router-dom";
+import { Context } from '../App'; 
+
 
 function Article() {
     const navigate = useNavigate();
@@ -10,13 +12,22 @@ function Article() {
     const [article, setArticle] = useState([]);
     const [errorMsg, setErrorMsg] = useState(null);
     const [username, setUsername] = useState(null);
+  
+
+    const [isAuth, setIsAuth] = useContext(Context)
+    const [usernameGlob, setUsernameGlob] = useContext(Context)
+
 
 
     useEffect(() => {
+        
         axios.get(`http://localhost:8080/blogs/${id}` )
         .then((response) => {
             setArticle(response.data)
             setUsername(response.data.User.username)
+            console.log("isAuth? " + isAuth)
+            console.log("username: " + usernameGlob)
+           
         })
         .catch((error) => {
             if (error.response.status == 400) {
@@ -30,6 +41,7 @@ function Article() {
 
     return (
         <>
+
         {errorMsg && (
             <div>{errorMsg}</div>
         )}
