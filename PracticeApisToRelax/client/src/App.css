@@ -1,0 +1,59 @@
+/* NAVBAR */
+.sub-cruddit-list {
+  font-size:11px;
+  font-family:Verdana, Geneva, Tahoma, sans-serif;
+  background-color:#e7e7e7;
+  display: flex;
+  justify-content: left;
+  list-style: none;
+  padding: 0;
+}
+
+.sub-cruddit-list a {
+  padding-right: 0.5em;
+  padding-left: 0.5em;
+  text-decoration: none;
+  color: #333;
+  transition: color 0.3s ease-in-out;
+}
+
+.sub-cruddit-list a:hover {
+  text-decoration: underline;
+  color: #555;
+}
+
+.orange-box {
+  width:3%;
+  background-color:#ff6314;
+}
+
+.lower-half {
+  background-color:rgb(199, 223, 244);
+  position:relative;
+  height: 50px;
+  width:100%;
+  border-top:1px solid rgb(92, 106, 122);
+  border-bottom:1px solid rgb(92, 106, 122);
+}
+
+.login-box {
+  letter-spacing:0.1em;
+  font-size:11px;
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  background-color: rgb(232, 239, 245);
+  border-top-left-radius:5px;
+  color: rgb(67, 73, 77);
+  z-index: 1;
+  padding-right:20px;
+  padding-left:20px;
+}
+
+.login-box #link {
+  color:rgb(23, 51, 84);
+}
+
+.login-box #link:hover {
+  cursor:pointer;
+}
